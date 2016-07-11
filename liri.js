@@ -23,36 +23,46 @@ var options = {
 var welcomeMsg = 'Hi I am LIRI. I can give you song information, movie information, or your latest tweets, what can I do for you?'  + '\r\n\r\n';
 
 //****** SETTING UP TWITTER ******** 
-var tweetClient = new Twitter({
-	consumer_key: _TWITTER_CONSUMER_KEY,
-	consumer_secret: _TWITTER_CONSUMER_SECRET,
-	access_token_key: _TWITTER_ACCESS_TOKEN_KEY,
-	access_token_secret: _TWITTER_ACCESS_TOKEN_SECRET,
-})
-var myTag = 'ArnoldLei';
-var params = {screen_name: myTag}
 var lastTweets = function(){
-	tweetClient.get('statues/user_timeline', params, function(error, tweets, response){
+	var tweetClient = new Twitter({
+		consumer_key: _TWITTER_CONSUMER_KEY,
+		consumer_secret: _TWITTER_CONSUMER_SECRET,
+		access_token_key: _TWITTER_ACCESS_TOKEN_KEY,
+		access_token_secret: _TWITTER_ACCESS_TOKEN_SECRET,
+	})
+	var myTag = 'ArnoldLei';
+	var params = {screen_name: myTag}
+	var latestTweets;
+
+	tweetClient.get('statuses/user_timeline', params, function(error, tweets, response){
 		if (!error){
-			console.log(tweets)
+			for (var i = 0; i < 10; i++){
+				 lastestTweets =  tweets[i].text;
+				 return latestTweets; 
+			}
+			
+		}else{
+			term(error)
 		}
 	})
 }
-
 term.clear();
+
 term.slowTyping(
 	welcomeMsg ,
 	{ 
 		flashStyle: term.yellow,
 		delay: 10, 
-	} ,
+	},
 	function() {
 		term.singleLineMenu( items , options , function( error , response ) {
 			term( '\n' ).eraseLineAfter.green(
 				"#%s selected: %s (%s,%s)\n" ,
-				'You have selected:'
+				response.selectedText,				
 				// response.x ,
-				// response.y
+				// response.y,
+				term.slowTyping('Here are your tweets:')
+				// term(lastTweets())
 			);
 			process.exit() ;
 		} ) ;
