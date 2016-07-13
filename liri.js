@@ -4,6 +4,8 @@ var Twitter = require('twitter');
 var Spotify = require('spotify');
 var request = require('request');
 
+var selection; 
+
 //****** twitterKeys *******//
 // consumer_key
 // consumer_secret
@@ -38,35 +40,44 @@ var lastTweets = function(){
 		if (!error){
 			for (var i = 0; i < 10; i++){
 				 lastestTweets =  tweets[i].text;
-				 return latestTweets; 
+				  term(tweets[i].text); 
 			}
 			
 		}else{
 			term(error)
 		}
 	})
+	process.exit();
 }
 term.clear();
 
-term.slowTyping(
-	welcomeMsg ,
-	{ 
-		flashStyle: term.yellow,
-		delay: 10, 
-	},
-	function() {
-		term.singleLineMenu( items , options , function( error , response ) {
-			term( '\n' ).eraseLineAfter.green(
-				"#%s selected: %s (%s,%s)\n" ,
-				response.selectedText,				
-				// response.x ,
-				// response.y,
-				term.slowTyping('Here are your tweets:')
-				// term(lastTweets())
-			);
-			process.exit() ;
-		} ) ;
-	}
-) ;
+
+
+var intro = function(){
+	term.slowTyping(
+		welcomeMsg ,
+		{ 
+			flashStyle: term.yellow,
+			delay: 10, 
+		},
+		function() {
+			term.singleLineMenu( items , options , function( error , response ) {
+				term( '\n' ).eraseLineAfter.green(
+					"#%s selected: %s (%s,%s)\n" ,
+					response.selectedText,
+					term('Something Else'),	
+					response.x,
+					response.y,
+					// response(lastTweets())
+					term(lastTweets())
+				);
+				
+			} ) ;
+		}
+
+	) ;
+}
+
+intro()
 
 
