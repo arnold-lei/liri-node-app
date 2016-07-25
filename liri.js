@@ -3,6 +3,7 @@ var keys = require('./keys');
 var Twitter = require('twitter');
 var Spotify = require('spotify');
 var request = require('request');
+var inquirer = require('inquirer');
 
 var selection; 
 
@@ -79,6 +80,13 @@ var intro = function(){
 
 }
 
-intro()
+inquirer.prompt({
+	name: 'ans',
+	message: 'Choose an option:',
+	type: 'rawlist',
+	choices: items
+}).then(function(ans){
+	console.log(ans);
+});
 
 
