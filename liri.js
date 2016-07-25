@@ -86,7 +86,19 @@ inquirer.prompt({
 	type: 'rawlist',
 	choices: items
 }).then(function(ans){
-	console.log(ans);
+	switch(answer) {
+		case 'My Tweets':
+			console.log('My Tweets');
+		break;
+
+		case 'Spotify Song':
+			console.log('Spotify Song');
+		break;
+
+		case 'Look Up Movie':
+			console.log('Look Up Movie');
+		break;
+	}
 });
 
 
