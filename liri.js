@@ -1,7 +1,7 @@
 var term = require('terminal-kit').terminal;
 var keys = require('./keys');
 var Twitter = require('twitter');
-var Spotify = require('spotify');
+var spotify = require('spotify');
 var request = require('request');
 var inquirer = require('inquirer');
 
@@ -41,7 +41,7 @@ var lastTweets = function(){
 		if (!error){
 			for (var i = 0; i < 10; i++){
 				 lastestTweets =  tweets[i].text;
-				  term(tweets[i].text); 
+				  console.log(tweets[i].text); 
 			}
 			
 		}else{
@@ -50,9 +50,33 @@ var lastTweets = function(){
 	})
 	// process.exit();
 }
-term.clear();
+var spotifySearch = function(){
+	inquirer.prompt({
+		name: 'song',
+		message: 'Please tell us what song you want to search?',
+		type: 'input'
+	}).then(function(search){
+		spotifyParse(search);
+	})
 
+}
 
+var spotifyParse = function(search){
+	spotify.search({ type: 'track', query: search }, function(error, data) {
+	    if(error) {
+	      console.log('Error occurred: ' + error);
+	      return;
+	    }
+	    var albumInfo = data.tracks.items[0];
+	    var spotifyResults = 
+	      "Artist: " + albumInfo.artists[0].name + "\r\n" +
+	      "Track Name: " + albumInfo.name + "\r\n" +
+	      "Album: " + albumInfo.album.name + "\r\n" +
+	      "Preview Link: " + albumInfo.preview_url + "\r\n\r\n";
+	    console.log(spotifyResults);
+	    logData(spotifyResults);
+  })
+}
 
 var intro = function(){
 	term.slowTyping(
@@ -61,44 +85,53 @@ var intro = function(){
 			flashStyle: term.yellow,
 			delay: 10, 
 		},
-		function() {
-			term.singleLineMenu( items , options , function( error , response) {
-				term( '\n' ).eraseLineAfter.green(
-					"#%s selected: %s (%s,%s)\n" ,
-					response.selectedText,
-					response.x,
-					response.y,
-					term(lastTweets()),
-					// response(lastTweets())
-					
-					setTimeout(function(){ process,exit(); }, 3000) 
-				);
-			
-			} );
+		function(){
+			liri()
 		}
+		// function() {
+		// 	term.singleLineMenu( items , options , function( error , response) {
+		// 		term( '\n' ).eraseLineAfter.green(
+		// 			"#%s selected: %s (%s,%s)\n" ,
+		// 			response.selectedText,
+		// 			response.x,
+		// 			response.y,
+		// 			term(lastTweets()),
+		// 			// response(lastTweets())
+					
+		// 			setTimeout(function(){ process,exit(); }, 3000) 
+		// 		);
+			
+		// 	} );
+		// }
 	) ;
 
 }
 
-inquirer.prompt({
-	name: 'ans',
-	message: 'Choose an option:',
-	type: 'rawlist',
-	choices: items
-}).then(function(ans){
-	switch(answer) {
-		case 'My Tweets':
-			console.log('My Tweets');
-		break;
+var liri = function(){
+	inquirer.prompt({
+		name: welcomeMsg + 'ans',
+		message: 'Choose an option:',
+		type: 'rawlist',
+		choices: items
+	}).then(function(ans){
+		switch(answer) {
+			case 'My Tweets':
+				lastTweets();
+				liri();
+			case 'Spotify Song':
+				spotifySearch()
+				console.log('Spotify Song');
+			break;
 
-		case 'Spotify Song':
-			console.log('Spotify Song');
-		break;
+			case 'Look Up Movie':
+				console.log('Look Up Movie');
+			break;
 
-		case 'Look Up Movie':
-			console.log('Look Up Movie');
-		break;
-	}
-});
+		}
+	});
+}
+term.clear();
+// intro();
 
-
+spotifySearch('Bruno Mars')
+// liri()
