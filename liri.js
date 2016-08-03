@@ -52,24 +52,37 @@ var lastTweets = function(callback){
 	// process.exit();
 }
 
-var omdbSerach = function(){
-	var omdbApi = 'http://www.omdbapi.com/?';
-	request(omdbApi, function (error, response, body) {
+var omdbSerach = function(movieTitle){
+	var omdbApi = 'http://www.omdbapi.com/?t=';
+	request(omdbApi + movieTitle + '&plot=short&r=json', function (error, response, body) {
 	  if (!error && response.statusCode == 200) {
-	    var results = 
-        "Title: " + JSON.parse(body)["Title"] + "\r\n";
-      console.log(results); 
+	    var results = 'Title: ' + JSON.parse(body)['Title'] + '\r\n' + 'Year: ' + JSON.parse(body)['Year'] + '\r\n'+ 'Imdb Rating: ' + JSON.parse(body)['imdbRating'] + '\r\n' + 'Plot: ' + JSON.parse(body)['Plot'] + '\r\n';
+      	console.log(results);
+      	liri();
+	  }else{
+	  	console.log(error);
 	  }
+	})
+	
+}
+
+var movieSearch = function(){
+	inquirer.prompt({
+		name: 'movie',
+		message: 'Please tell me what movie you want to search?',
+		type: 'input'
+	}).then(function(movie){
+		omdbSerach(movie.movie);
 	})
 }
 
 var spotifySearch = function(){
 	inquirer.prompt({
 		name: 'song',
-		message: 'Please tell us what song you want to search?',
+		message: 'Please tell me what song you want to search?',
 		type: 'input'
-	}).then(function(search){
-		spotifyParse(search);
+	}).then(function(song){
+		spotifyParse(song.song);
 	})
 
 }
@@ -87,6 +100,7 @@ var spotifyParse = function(search){
 	      "Album: " + albumInfo.album.name + "\r\n" +
 	      "Preview Link: " + albumInfo.preview_url + "\r\n\r\n";
 	    console.log(spotifyResults);
+	    liri();
   })
 }
 
@@ -127,10 +141,9 @@ var liri = function(){
 		type: 'rawlist',
 		choices: items
 	}).then(function(ans){
-		console.log(ans.ans)
+		term.clear();
 		switch(ans.ans) {
 			case 'My Tweets':
-				console.log('this is from the console');
 				lastTweets();
 				break;
 			case 'Spotify Song':
@@ -139,9 +152,10 @@ var liri = function(){
 			break;
 
 			case 'Look Up Movie':
-				console.log('Look Up Movie');
+				movieSearch();
 			break;
 			case 'Exit':
+				term.clear();
 				process.exit();
 			break;
 		}
