@@ -18,7 +18,7 @@ var _TWITTER_CONSUMER_SECRET = keys.twitterKeys.consumer_secret;
 var _TWITTER_ACCESS_TOKEN_KEY = keys.twitterKeys.access_token_key;
 var _TWITTER_ACCESS_TOKEN_SECRET = keys.twitterKeys.access_token_secret;
 
-var items = ['My Tweets', 'Spotify Song', 'Look Up Movie'];
+var items = ['My Tweets', 'Spotify Song', 'Look Up Movie', 'Exit'];
 var options = {
 	style: term.inverse ,
 	selectedStyle: term.white.bgYellow
@@ -41,12 +41,13 @@ var lastTweets = function(callback){
 		if (!error){
 			for (var i = 0; i < 10; i++){
 				var results = '@' + tweets[i].user.screen_name +': ' +  tweets[i].text+ '\r\n';
-				callback(results); 
+				console.log(results); 
 			}
 			
 		}else{
 			term(error)
-		}
+		};
+		liri()
 	})
 	// process.exit();
 }
@@ -121,17 +122,17 @@ var intro = function(callback){
 var liri = function(){
 
 	inquirer.prompt({
-		name: welcomeMsg + 'ans',
+		name: 'ans',
 		message: 'Choose an option:',
 		type: 'rawlist',
 		choices: items
 	}).then(function(ans){
-		switch(answer) {
+		console.log(ans.ans)
+		switch(ans.ans) {
 			case 'My Tweets':
-				lastTweets(function(){
-					term(results);
-				});
-				liri();
+				console.log('this is from the console');
+				lastTweets();
+				break;
 			case 'Spotify Song':
 				spotifySearch()
 				console.log('Spotify Song');
@@ -140,7 +141,9 @@ var liri = function(){
 			case 'Look Up Movie':
 				console.log('Look Up Movie');
 			break;
-
+			case 'Exit':
+				process.exit();
+			break;
 		}
 	});
 }
