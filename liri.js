@@ -26,7 +26,7 @@ var options = {
 var welcomeMsg = 'Hi I am LIRI. I can give you song information, movie information, or your latest tweets, what can I do for you?'  + '\r\n\r\n';
 
 //****** SETTING UP TWITTER ******** 
-var lastTweets = function(){
+var lastTweets = function(callback){
 	var tweetClient = new Twitter({
 		consumer_key: _TWITTER_CONSUMER_KEY,
 		consumer_secret: _TWITTER_CONSUMER_SECRET,
@@ -40,8 +40,8 @@ var lastTweets = function(){
 	tweetClient.get('statuses/user_timeline', params, function(error, tweets, response){
 		if (!error){
 			for (var i = 0; i < 10; i++){
-				 lastestTweets =  tweets[i].text;
-				  console.log(tweets[i].text); 
+				var results = '@' + tweets[i].user.screen_name +': ' +  tweets[i].text+ '\r\n';
+				callback(results); 
 			}
 			
 		}else{
@@ -50,6 +50,18 @@ var lastTweets = function(){
 	})
 	// process.exit();
 }
+
+var omdbSerach = function(){
+	var omdbApi = 'http://www.omdbapi.com/?';
+	request(omdbApi, function (error, response, body) {
+	  if (!error && response.statusCode == 200) {
+	    var results = 
+        "Title: " + JSON.parse(body)["Title"] + "\r\n";
+      console.log(results); 
+	  }
+	})
+}
+
 var spotifySearch = function(){
 	inquirer.prompt({
 		name: 'song',
@@ -74,11 +86,10 @@ var spotifyParse = function(search){
 	      "Album: " + albumInfo.album.name + "\r\n" +
 	      "Preview Link: " + albumInfo.preview_url + "\r\n\r\n";
 	    console.log(spotifyResults);
-	    logData(spotifyResults);
   })
 }
 
-var intro = function(){
+var intro = function(callback){
 	term.slowTyping(
 		welcomeMsg ,
 		{ 
@@ -86,7 +97,7 @@ var intro = function(){
 			delay: 10, 
 		},
 		function(){
-			liri()
+			callback()
 		}
 		// function() {
 		// 	term.singleLineMenu( items , options , function( error , response) {
@@ -108,6 +119,7 @@ var intro = function(){
 }
 
 var liri = function(){
+
 	inquirer.prompt({
 		name: welcomeMsg + 'ans',
 		message: 'Choose an option:',
@@ -116,7 +128,9 @@ var liri = function(){
 	}).then(function(ans){
 		switch(answer) {
 			case 'My Tweets':
-				lastTweets();
+				lastTweets(function(){
+					term(results);
+				});
 				liri();
 			case 'Spotify Song':
 				spotifySearch()
@@ -131,7 +145,12 @@ var liri = function(){
 	});
 }
 term.clear();
+intro(liri);
 // intro();
 
-spotifySearch('Bruno Mars')
+// spotifySearch('Bruno Mars')
 // liri()
+
+// omdbSerach('Top Gun');
+
+
